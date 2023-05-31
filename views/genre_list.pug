@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each genres in allGenres
+      li
+        a(href=`genre/${genres.id}`)
+          | #{genres.name}
+       
+
+    else
+      li There are no authors.
