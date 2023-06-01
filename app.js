@@ -10,8 +10,11 @@ var wikiRouter = require("./routes/wiki");
 const compression = require("compression");
 const helmet = require("helmet");
 const catalogRouter = require("./routes/catalog");
-const mongoConnectString =
+const dev_db_url =
   "mongodb+srv://0939899928zacom:1380621694zZ@mongolearning.rfkssjg.mongodb.net/local_library?retryWrites=true&w=majority";
+
+const mongoConnectString = process.env.MONGODB_URI || dev_db_url;
+
 var app = express();
 // mongoose setup
 main().catch((err) => console.log(err));
