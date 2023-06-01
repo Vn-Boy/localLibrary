@@ -7,26 +7,44 @@ const mongoose = require("mongoose");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var wikiRouter = require("./routes/wiki");
+const compression = require("compression");
+const helmet = require("helmet");
 const catalogRouter = require("./routes/catalog");
 const mongoConnectString =
   "mongodb+srv://0939899928zacom:1380621694zZ@mongolearning.rfkssjg.mongodb.net/local_library?retryWrites=true&w=majority";
 var app = express();
 // mongoose setup
 main().catch((err) => console.log(err));
-console.log(mongoConnectString);
 async function main() {
   await mongoose.connect(mongoConnectString);
 }
 mongoose.set("strictQuery", false);
 // view engine setup
+// Set up rate limiter: maximum of twenty requests per minute
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(compression());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
+
 app.use("/users", usersRouter);
 app.use("/wiki", wikiRouter);
 app.use("/catalog", catalogRouter);
